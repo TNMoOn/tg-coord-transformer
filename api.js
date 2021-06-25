@@ -12,7 +12,8 @@ export async function getModelInfo(modelName) {
       name: modelName,
     }
   })
-
+  if (!result) throw new Error("model不存在，请传入正确的model名称")
+  
   return {
     name: result["Model_Info:Name"],
     parent: result["Model_Info:Parent"],
