@@ -1,6 +1,7 @@
-import { getModelInfo, getModelLocationAndOffset } from "./api"
+import { getModelInfo, getModelLocationAndOffset, switchRequestUrl } from "./api"
 import proj4 from "proj4"
 import { TransformFormulaParser } from "./TransformFormulaParser"
+import { SUZHOU_ADDRESS } from "./config"
 
 export class TgCoordTransformer {
   name = null
@@ -38,7 +39,10 @@ export class TgCoordTransformer {
     this._transformFormulaParser = value
   }
 
-  async initialize() {
+  async initialize({ url } = {}) {
+    if (url) switchRequestUrl(url)
+    else switchRequestUrl(SUZHOU_ADDRESS)
+
     const [{ projection }, { offset }] = await Promise.all([
       getModelInfo(this.name),
       getModelLocationAndOffset(this.name),

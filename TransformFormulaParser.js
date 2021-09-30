@@ -5,7 +5,7 @@ export class TransformFormulaParser {
   transformFormulaParams = null
 
   constructor({ transformFormulaId, transformFormulaParams } = {}) {
-    if (transformFormulaId) this.transformFormulaId = transformFormulaId
+    if (transformFormulaId || transformFormulaId === 0) this.transformFormulaId = transformFormulaId
     if (transformFormulaParams) this.transformFormulaParams = transformFormulaParams
   }
 
@@ -126,12 +126,14 @@ export class TransformFormulaParser {
 }
 
 function decodeBand(coordinate, band) {
+  if (typeof (band) !== "number") band = band.toString()
   if (band === "" || band === "0") return coordinate
   const offset = coordinate.toString().indexOf(band)
   return Number(coordinate.toString().slice(offset + band.length))
 }
 
 function encodeBand(coordinate, band) {
+  if (typeof (band) !== "number") band = band.toString()
   if (band === "" || band === "0") return coordinate
   return Number(band.toString() + coordinate.toString())
 }

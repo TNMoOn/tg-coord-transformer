@@ -14,7 +14,10 @@ import { TgCoordTransformer } from "tg-coord-transformer"
 const tgCoordTransformer = new TgCoordTransformer("Model_xianhe")
 
 // 调用initialize()方法初始化
+// 1.不指定初始化url时，将默认访问苏州服务器
 await tgCoordTransformer.initialize()
+// 2.指定初始化url
+await tgCoordTransformer.initialize({ url: "https://www.abc.def" })
 
 // 手动赋值初始化
 tgCoordTransformer.params = "+proj=tmerc +lat_0=0 +lon_0=96 +k=1 +x_0=500000 +y_0=0 +ellps=krass +units=m +no_defs "
