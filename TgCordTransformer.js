@@ -57,9 +57,14 @@ export class TgCoordTransformer {
   }
 
   localToWGS84(fromVertice) {
-    fromVertice = this.transformFormulaParser.decode(fromVertice)
-    fromVertice = [...proj4(this.params, proj4.WGS84, [fromVertice[0], fromVertice[1]]), fromVertice[2]]
-    const toVerticeLonglat = fromVertice.map((value, index) => value + this.offset[index])
+    const decodedLocalVertice = this.transformFormulaParser.decode(fromVertice)
+    const wgs84LonglatVertice = [...proj4(this.params, proj4.WGS84, [decodedLocalVertice[0], decodedLocalVertice[1]]), decodedLocalVertice[2]]
+
+    if (wgs84LonglatVertice.findIndex(x => !(typeof (x) === 'number' && !isNaN(x))) !== -1) {
+      throw new Error(`模型局部坐标向wgs84坐标转换出错，请检查投影参数！局部坐标为: [${fromVertice}]，解码后坐标为: [${decodedLocalVertice}]，投影参数为: ${this.params}`);
+    }
+
+    const toVerticeLonglat = wgs84LonglatVertice.map((value, index) => value + this.offset[index])
     const toVerticeGeocent = proj4(proj4.WGS84, "+proj=geocent +datum=WGS84 +units=m +no_defs", toVerticeLonglat)
     return {
       longlat: toVerticeLonglat,

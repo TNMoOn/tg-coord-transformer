@@ -126,14 +126,14 @@ export class TransformFormulaParser {
 }
 
 function decodeBand(coordinate, band) {
-  if (typeof (band) !== "number") band = band.toString()
+  if (typeof (band) === "number") band = band.toString()
   if (band === "" || band === "0") return coordinate
   const offset = coordinate.toString().indexOf(band)
   return Number(coordinate.toString().slice(offset + band.length))
 }
 
 function encodeBand(coordinate, band) {
-  if (typeof (band) !== "number") band = band.toString()
+  if (typeof (band) === "number") band = band.toString()
   if (band === "" || band === "0") return coordinate
   return Number(band.toString() + coordinate.toString())
 }
