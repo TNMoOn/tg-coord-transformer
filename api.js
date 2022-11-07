@@ -1,5 +1,6 @@
 import createAxiosInstance from "./request"
 import { BEIJING_ADDRESS, SUZHOU_ADDRESS } from "./config"
+import * as THREE from "three"
 
 const requestCache = {
   BEIJING_ADDRESS: createAxiosInstance(BEIJING_ADDRESS),
@@ -46,4 +47,32 @@ export async function getModelLocationAndOffset(modelName) {
     offset: result.offset.split(",").map(v => Number.parseFloat(v)),
     location: result.location.split(",").map(v => Number.parseFloat(v)),
   }
+}
+
+export async function getGridLocalCoordinate(gridName) {
+  const { "Grid_Info:Local_Coordinate": data } = await request({
+    method: 'post',
+    url: '/manager/get_data',
+    data: {
+      type: 'get_local_coordinate',
+      name: gridName,
+    }
+  })
+
+  return {
+    xLocalAxis: new THREE.Vector3(data["x_dir"].x, data["x_dir"].y, data["x_dir"].z),
+    yLocalAxis: new THREE.Vector3(data["y_dir"].x, data["y_dir"].y, data["y_dir"].z),
+    zLocalAxis: new THREE.Vector3(data["z_dir"].x, data["z_dir"].y, data["z_dir"].z),
+  }
+}
+
+export async function getModelGridList(modelName) {
+  return (await request({
+    method: 'post',
+    url: '/manager/get_data',
+    data: {
+      type: 'get_model_grids_list',
+      name: modelName,
+    },
+  })).map(gridName => modelName + "-Grid_" + gridName)
 }
