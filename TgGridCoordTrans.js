@@ -1,11 +1,11 @@
 import { getGridLocalCoordinate } from "./api";
 import proj4 from "proj4"
+import * as THREE from "three"
 
 export default class TgGridCoordTrans {
   name;
   parent;
-
-  xAxis; yAxis; zAxis;
+  rotatedTranslatedMatrix;
 
   constructor(name, parent) {
     this.name = name;
@@ -13,11 +13,19 @@ export default class TgGridCoordTrans {
   }
 
   async initialize() {
-    ({ xAxis: this.xAxis, yAxis: this.yAxis } = await getGridLocalCoordinate(this.name));
+    const { xAxisLocal, yAxisLocal, zAxisLocal, originCoord } = await getGridLocalCoordinate(this.name);
+    this.rotatedTranslatedMatrix = new THREE.Matrix4().makeTranslation(originCoord.x, originCoord.y, originCoord.z).multiply(
+      new THREE.Matrix4().setFromMatrix3(new THREE.Matrix3().set(
+        xAxisLocal.x, yAxisLocal.x, zAxisLocal.x,
+        xAxisLocal.y, yAxisLocal.y, zAxisLocal.y,
+        xAxisLocal.z, yAxisLocal.z, zAxisLocal.z,
+      ))
+    );
   }
 
   localToWGS84(fromVertice) {
-    const decodedLocalVertice = this.parent.transformFormulaParser.decode(fromVertice)
+    const rotatedTranslatedLocalVertice = new THREE.Vector3().fromArray(fromVertice).applyMatrix4(this.rotatedTranslatedMatrix);
+    const decodedLocalVertice = this.parent.transformFormulaParser.decode(rotatedTranslatedLocalVertice.toArray())
     const wgs84LonglatVertice = [...proj4(this.parent.params, proj4.WGS84, [decodedLocalVertice[0], decodedLocalVertice[1]]), decodedLocalVertice[2]]
 
     if (wgs84LonglatVertice.findIndex(x => !(typeof (x) === 'number' && !isNaN(x))) !== -1) {

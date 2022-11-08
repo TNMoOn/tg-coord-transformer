@@ -60,9 +60,10 @@ export async function getGridLocalCoordinate(gridName) {
   })
 
   return {
-    xLocalAxis: new THREE.Vector3(data["x_dir"].x, data["x_dir"].y, data["x_dir"].z),
-    yLocalAxis: new THREE.Vector3(data["y_dir"].x, data["y_dir"].y, data["y_dir"].z),
-    zLocalAxis: new THREE.Vector3(data["z_dir"].x, data["z_dir"].y, data["z_dir"].z),
+    xAxisLocal: new THREE.Vector3(data["x_dir"].x, data["x_dir"].y, data["x_dir"].z).normalize(),
+    yAxisLocal: new THREE.Vector3(data["y_dir"].x, data["y_dir"].y, data["y_dir"].z).normalize(),
+    zAxisLocal: new THREE.Vector3(data["z_dir"].x, data["z_dir"].y, data["z_dir"].z).normalize(),
+    originCoord: data ? new THREE.Vector3(data.origin.x, data.origin.y, data.origin.z,) : new THREE.Vector3(0, 0, 0),
   }
 }
 
